@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="zh-Hant" data-lesson="w01-l1" data-date="2026-11-16">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>w01-l1｜AI 工廠全景：token 經濟與五層堆疊</title>
+<!-- HANDOUT:STYLE:BEGIN（由 handout.py sync 維護，不要手改這一段） -->
+<style>
+:root{
+  --bg:#f7f5f0; --surface:#fffdf8; --surface2:#efece4; --ink:#1f2328; --muted:#5d646d; --line:#d9d4c7;
+  --accent:#0f766e; --accent-soft:#d9efec; --warm:#b45309; --warm-soft:#fbead2;
+  --cust:#4338ca; --cust-soft:#e4e3fb; --bad:#b42318; --bad-soft:#fbe3e0; --good:#18794e;
+  --radius:12px; --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#15171a; --surface:#1d2024; --surface2:#262a2f; --ink:#e8e6e1; --muted:#a0a6ae; --line:#373c43;
+    --accent:#4fd1c1; --accent-soft:#143d39; --warm:#f0a856; --warm-soft:#43301a;
+    --cust:#a5a2ff; --cust-soft:#2b2a55; --bad:#ff8a7a; --bad-soft:#4a211d; --good:#5fd39a;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.8}
+main,header.hero>div{max-width:820px;margin:0 auto;padding:0 18px}
+h1,h2,h3,h4{line-height:1.35;margin:0}
+p{margin:.7em 0}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);padding:.1em .35em;border-radius:5px;word-break:break-all}
+[lang="en"]{font-family:Georgia,"Times New Roman",serif}
+
+/* 頁首 */
+header.hero{background:var(--surface);border-bottom:1px solid var(--line);padding:26px 0 20px}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--accent);font-weight:700;text-transform:uppercase}
+header.hero h1{font-size:clamp(24px,4.6vw,34px);margin:.25em 0 .35em;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 8px;font-size:13px;color:var(--muted)}
+.chip{border:1px solid var(--line);border-radius:999px;padding:1px 10px;background:var(--bg);white-space:nowrap}
+.goal{margin-top:14px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 var(--radius) var(--radius) 0;font-size:15.5px}
+.goal b{display:block;font-size:12.5px;letter-spacing:.06em;color:var(--accent)}
+
+/* 步驟導覽 */
+nav.steps{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.steps ol{max-width:820px;margin:0 auto;padding:8px 18px;display:flex;gap:6px;list-style:none;overflow-x:auto;scrollbar-width:none}
+nav.steps a{display:block;white-space:nowrap;font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 11px;background:var(--surface)}
+nav.steps a b{color:var(--accent);margin-right:4px}
+
+/* 區段 */
+section{padding:34px 0 6px;scroll-margin-top:52px}
+section>h2{font-size:22px;display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+section>h2 .step{flex:none;font-size:12px;font-weight:700;color:var(--surface);background:var(--accent);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+section>h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:auto;white-space:nowrap}
+.lead{color:var(--muted);font-size:15.5px;margin-top:0}
+article.concept{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 14px;margin:18px 0}
+article.concept>h3{font-size:19px;margin-bottom:2px}
+article.concept>h3 .no{color:var(--accent);margin-right:8px;font-variant-numeric:tabular-nums}
+.claim{font-size:17.5px;font-weight:600;margin:.4em 0 .8em}
+
+/* 提示框 */
+.callout{border-radius:var(--radius);padding:12px 16px;margin:14px 0;border:1px solid var(--line);background:var(--surface)}
+.callout>b:first-child{display:block;font-size:12.5px;letter-spacing:.06em;margin-bottom:2px}
+.callout.analogy{background:var(--warm-soft);border-color:transparent}.callout.analogy>b:first-child{color:var(--warm)}
+.callout.customer{background:var(--cust-soft);border-color:transparent}.callout.customer>b:first-child{color:var(--cust)}
+.callout.warn{background:var(--bad-soft);border-color:transparent}.callout.warn>b:first-child{color:var(--bad)}
+.callout.story{background:var(--surface);border-left:4px solid var(--warm)}
+.callout p{margin:.35em 0}
+
+/* 圖：通用 */
+figure.fig{margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);overflow-x:auto}
+article.concept figure.fig{background:var(--bg)}
+figure.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.6}
+figure.fig figcaption b{color:var(--ink)}
+
+/* 圖：層疊 stack */
+.stack{display:flex;flex-direction:column-reverse;gap:6px}
+.stack .layer{display:grid;grid-template-columns:34px 1.1fr 1.6fr 1.3fr;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14.5px;line-height:1.5}
+.stack .layer .n{font-weight:700;color:var(--accent);font-size:17px;text-align:center}
+.stack .layer .name{font-weight:700}
+.stack .layer .tech{color:var(--muted)}
+.stack .layer .metric{font-family:var(--mono);font-size:12.5px;color:var(--warm)}
+.stack .layer.hl{border-color:var(--accent);background:var(--accent-soft)}
+.stack .layer .wk{font-size:11.5px;color:var(--muted);display:block}
+
+/* 圖：流程 flow */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.flow .node{flex:1 1 120px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.5;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.flow .node b{display:block}
+.flow .node small{color:var(--muted);font-size:12.5px}
+.flow .node.hl{border-color:var(--accent);background:var(--accent-soft)}
+.flow .node.warm{border-color:var(--warm);background:var(--warm-soft)}
+.flow .arrow{flex:none;align-self:center;padding:0 8px;color:var(--muted);font-size:20px}
+.flow .arrow::before{content:"→"}
+
+/* 圖：對照 vs */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vs .side{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.6}
+.vs .side h4{font-size:15.5px;margin-bottom:6px}
+.vs .side.a{border-top:4px solid var(--muted)}.vs .side.b{border-top:4px solid var(--accent)}
+.vs dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.vs dt{color:var(--muted);font-size:13px}.vs dd{margin:0;font-weight:600}
+
+/* 圖：數字卡 nums */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.num{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.num .v{font-size:28px;font-weight:800;color:var(--accent);line-height:1.15;font-variant-numeric:tabular-nums}
+.num .l{font-size:14px;line-height:1.5;margin-top:4px}
+.num .s{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:6px;border-top:1px dashed var(--line);padding-top:5px}
+.num.warm .v{color:var(--warm)}
+
+/* 圖：橫條 bars（style="--v:60" 代表 60%） */
+.bars{display:grid;gap:7px;font-size:14px}
+.bars .bar{display:grid;grid-template-columns:minmax(72px,auto) 1fr 52px;gap:10px;align-items:center}
+.bars .bar i{display:block;height:20px;border-radius:5px;background:var(--surface2);position:relative;overflow:hidden}
+.bars .bar i::after{content:"";position:absolute;inset:0 auto 0 0;width:calc(var(--v)*1%);background:var(--accent);border-radius:5px}
+.bars .bar.warm i::after{background:var(--warm)}
+.bars .bar.mute i::after{background:var(--muted)}
+.bars .bar span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
+
+/* 圖：公式 formula */
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:15px}
+.formula .term{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 11px;text-align:center;line-height:1.4}
+.formula .term small{display:block;font-size:11.5px;color:var(--muted)}
+.formula .term.money{border-color:var(--muted)}
+.formula .term.skill{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.formula .op{color:var(--muted);font-weight:700}
+
+/* 圖：時間軸 timeline */
+.timeline{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(110px,1fr);gap:0;overflow-x:auto}
+.timeline .tick{border-top:3px solid var(--accent);padding:10px 10px 0 0;font-size:13.5px;line-height:1.5;position:relative}
+.timeline .tick::before{content:"";position:absolute;top:-7px;left:0;width:11px;height:11px;border-radius:50%;background:var(--accent)}
+.timeline .tick b{display:block;font-size:15px}
+.timeline .tick small{color:var(--muted)}
+
+/* 圖：SVG */
+svg.diagram{display:block;width:100%;height:auto;max-width:720px;margin:0 auto;font-family:var(--font)}
+svg.diagram .box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg.diagram .box.hl{fill:var(--accent-soft);stroke:var(--accent)}
+svg.diagram .box.warm{fill:var(--warm-soft);stroke:var(--warm)}
+svg.diagram text{fill:var(--ink);font-size:14px}
+svg.diagram text.sub{fill:var(--muted);font-size:12px}
+svg.diagram .wire{stroke:var(--muted);stroke-width:1.5;fill:none}
+svg.diagram .wire.hl{stroke:var(--accent);stroke-width:2.5}
+
+/* 表格 */
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.6}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
+
+/* 檢查點 */
+details.check{margin:14px 0 6px;border:1px dashed var(--accent);border-radius:10px;padding:10px 14px;background:var(--surface)}
+details.check summary{cursor:pointer;font-weight:600;list-style:none}
+details.check summary::-webkit-details-marker{display:none}
+details.check summary::before{content:"✋ 停一下　";color:var(--accent)}
+details.check summary::after{content:"（先在心裡回答，再點開）";font-weight:400;font-size:13px;color:var(--muted)}
+details.check[open] summary::after{content:""}
+details.check>p{margin:.5em 0 .2em}
+
+/* 題目 */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:12px 0}
+.q-head{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:2px}
+.q-head .tag{border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.q-text{font-weight:600;margin:.2em 0 .6em}
+.q textarea{width:100%;min-height:74px;font:inherit;font-size:15.5px;line-height:1.6;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical}
+.q textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.q-row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px;font-size:13.5px;color:var(--muted)}
+.q button,.btn{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:4px 11px;cursor:pointer}
+.q button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.q button.reveal,.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.q button:disabled{opacity:.45;cursor:not-allowed}
+.q-answer{display:none;margin:12px 0 0;padding:12px 14px;border-radius:10px;background:var(--accent-soft)}
+.q.revealed .q-answer{display:block}
+.q-answer ul{margin:.4em 0;padding-left:1.2em}
+.q-answer li{margin:.15em 0}
+.q-src{font-size:12px;color:var(--muted);margin:.4em 0 0}
+.q-prev{font-size:13.5px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:8px 0;white-space:pre-wrap}
+.q .flag{font-size:13px;font-weight:700}
+.q .flag.over{color:var(--bad)}.q .flag.under{color:var(--good)}
+
+/* 成績列 */
+.scorebar{position:sticky;bottom:10px;margin:18px 0 6px;background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;box-shadow:0 6px 18px rgb(0 0 0/.18)}
+.scorebar b{font-size:18px;font-variant-numeric:tabular-nums}
+.scorebar .btn{margin-left:auto}
+#export-out{width:100%;font-family:var(--mono);font-size:12px;margin-top:8px;display:none;min-height:54px}
+.note{font-size:13.5px;color:var(--muted)}
+.wrap-box textarea{width:100%;min-height:60px;font:inherit;font-size:15.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+ul.review{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+ul.review li{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;font-size:13.5px}
+ul.review li b{color:var(--accent)}
+footer{max-width:820px;margin:30px auto 0;padding:18px 18px 90px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
+
+@media (max-width:600px){
+  body{font-size:16px}
+  .stack .layer{grid-template-columns:26px 1fr;row-gap:2px}
+  .stack .layer .tech,.stack .layer .metric{grid-column:2}
+  .vs{grid-template-columns:1fr}
+  .flow{flex-direction:column}
+  .flow .node{flex:none}
+  .flow .arrow{padding:2px 0}.flow .arrow::before{content:"↓"}
+  section>h2{flex-wrap:wrap}section>h2 small{margin-left:0;width:100%}
+}
+@media print{
+  nav.steps,.scorebar,.q textarea,.q-row{display:none}
+  .q-answer{display:block}
+  body{background:#fff}
+}
+</style>
+<!-- HANDOUT:STYLE:END -->
+</head>
+<body>
+
+<header class="hero"><div>
+  <div class="eyebrow">w01-l1 · W1 AI 工廠全景與 GPU 基礎</div>
+  <h1>AI 工廠全景：token 經濟與五層堆疊</h1>
+  <div class="meta">
+    <span class="chip">2026-11-16（一）</span>
+    <span class="chip">約 90 分鐘</span>
+    <span class="chip">TMM</span><span class="chip">PMM</span><span class="chip">EVG</span><span class="chip">TAM</span>
+  </div>
+  <div class="goal"><b>這一課結束時，你要能不看資料回答</b>
+    資料中心為什麼被叫做「工廠」？一座 Token 工廠的收入與成本怎麼算？
+  </div>
+</div></header>
+
+<nav class="steps"><ol>
+  <li><a href="#warmup"><b>1</b>暖身回想</a></li>
+  <li><a href="#pretest"><b>2</b>先猜</a></li>
+  <li><a href="#hook"><b>3</b>為什麼重要</a></li>
+  <li><a href="#concepts"><b>4</b>核心概念</a></li>
+  <li><a href="#worked"><b>5</b>動手算</a></li>
+  <li><a href="#myths"><b>6</b>常見誤解</a></li>
+  <li><a href="#pitch"><b>7</b>對客戶怎麼說</a></li>
+  <li><a href="#exit"><b>8</b>課後小考</a></li>
+  <li><a href="#wrap"><b>9</b>收尾</a></li>
+</ol></nav>
+
+<main>
+
+<section id="warmup">
+  <h2><span class="step">STEP 1</span>暖身回想<small>10 分鐘 · 閉卷</small></h2>
+  <p class="lead">這是第一課，還沒有舊題可以複習。先把你腦中已經有的東西倒出來——之後學到的新知識，會掛在這些舊知識上。</p>
+  <div class="wrap-box">
+    <p><b>不查資料，寫下三件事：</b>① 你現在怎麼向朋友解釋「AI 資料中心」跟一般機房有什麼不同？② 你覺得一座 AI 機房最花錢的是什麼？③ 你聽過哪些跟 AI 算力有關的名詞但其實說不清楚？</p>
+    <textarea data-save="warmup" placeholder="想到什麼寫什麼，不用完整…"></textarea>
+  </div>
+</section>
+
+<section id="pretest">
+  <h2><span class="step">STEP 2</span>先猜再學<small>5 分鐘 · 不計分</small></h2>
+  <p class="lead">還沒學就先回答。猜錯沒有關係：先試過的問題，等一下讀到答案時會記得特別牢。這裡不會顯示答案。</p>
+  <div class="q" data-qid="w01-l1-q01" data-kind="P" data-type="explain">
+<p class="q-text">黃仁勳說資料中心不再是一台電腦，而是一座「工廠」。這座工廠的原料與產品各是什麼？它最重要的 KPI 是什麼，為什麼是這個？</p>
+</div>
+  <div class="q" data-qid="w01-l1-q02" data-kind="P" data-type="recall">
+<p class="q-text">一座 Token 工廠的成本結構裡，佔比最大的是哪一項？電費大約佔多少？（數量級即可）</p>
+</div>
+  <div class="q" data-qid="w01-l1-q03" data-kind="P" data-type="explain">
+<p class="q-text">每百萬 token 的輸出單價三年跌了約 140 倍。這個產業的總盤子是變大還是變小？用一個經濟學概念解釋，並說出需求端正在發生的結構變化。</p>
+</div>
+</section>
+
+<section id="hook">
+  <h2><span class="step">STEP 3</span>為什麼重要</h2>
+  <div class="callout story"><b>情境</b>
+    <p>面試最後一關，面試官是亞太區行銷主管。他沒有問你 GPU 規格，只問了一句：<span lang="en">"Token prices have dropped more than a hundred times in three years. Why are our customers still spending billions on infrastructure?"</span></p>
+    <p>這題答不好，後面講再多技術都沒用——因為它在問你懂不懂這門生意。今天這一課就是這題的答案，也是後面十一週每一項技術的「所以呢」。</p>
+  </div>
+</section>
+
+<section id="concepts">
+  <h2><span class="step">STEP 4</span>核心概念<small>45 分鐘 · 搭配必讀文章</small></h2>
+  <p class="lead">今天只有四件事。每件事讀完，先回答檢查點再往下。必讀文章是 repo 裡的 Token Factory 圖文講解（連結在頁尾），建議讀完概念 1、2 之後去讀原文，再回來看概念 3、4。</p>
+
+  <article class="concept" id="c1">
+    <h3><span class="no">1</span>資料中心變成了工廠</h3>
+    <p class="claim">AI 工廠（AI factory）吃進電力，產出 token；它的頭號 KPI 是每瓦產出多少 token（tokens per watt）。</p>
+    <p>傳統資料中心像一棟辦公大樓，裡面跑著各種不相干的應用。AI 工廠只做一件事：把電變成模型的輸出。NVIDIA 執行長黃仁勳的說法是，資料中心不再是一台電腦，而是一座工廠——注入能量，產出的產品叫 token。</p>
+    <p>這個比喻改變了生意的算法。過去的算力中心是「算力房東」，把 GPU 按小時租出去；Token 工廠是「產品製造商」，賣的是產出。同一張卡，客戶買的從時間變成產出，帳本就完全不同。</p>
+    <figure class="fig">
+      <div class="vs">
+        <div class="side a"><h4>算力房東：賣時間</h4>
+          <dl><dt>賣什麼</dt><dd>GPU 小時</dd><dt>利用率</dt><dd>30–50%</dd><dt>毛利率</dt><dd>20–30%</dd><dt>回本</dt><dd>3–5 年</dd></dl></div>
+        <div class="side b"><h4>產品製造商：賣產出</h4>
+          <dl><dt>賣什麼</dt><dd>token</dd><dt>利用率</dt><dd>80% 以上</dd><dt>毛利率</dt><dd>40–50%</dd><dt>回本</dt><dd>約 2 年</dd></dl></div>
+      </div>
+      <figcaption><b>圖 1</b>　兩種商業模式的帳本。數字為 repo 演講稿引用的業界口徑（2026-09），用來看數量級的差距，不是任何一家公司的財報。</figcaption>
+    </figure>
+    <div class="callout analogy"><b>類比</b><p>出租廚房和開便當工廠的差別。出租廚房的人只在乎廚房有沒有租出去；便當工廠在乎的是同樣的瓦斯和人力，一天能做出幾個賣得掉的便當。</p></div>
+    <details class="check"><summary>為什麼 KPI 是「每瓦 token」，而不是「擁有幾張 GPU」？</summary>
+      <p>因為電力是物理上限。一座機房拿到多少供電容量，蓋好之後就固定了——1 GW 的工廠不會變成 2 GW。GPU 可以換代、可以加買，但只要供電不變，營收要成長就只能靠同樣的電產出更多 token。</p></details>
+  </article>
+
+  <article class="concept" id="c2">
+    <h3><span class="no">2</span>剪刀差：單價往下，用量往上</h3>
+    <p class="claim">token 單價三年跌了約 140 倍，用量漲得更快，所以整個產業的盤子是變大的。</p>
+    <p>token 能當成產品賣，是因為它同時是資訊單位、算力消耗單位、計費單位：數得出來、訂得出價格、可以按量交易。有了計量單位，才談得上產業——就像電力有了「度」。</p>
+    <p>價格下跌而總支出上升，經濟學叫 Jevons 悖論：東西變便宜，大家用得更多，總開銷反而增加。需求端還有一個結構性變化——消耗 token 的主力正從「人」變成「機器」。一個 agent 完成一件事要呼叫模型很多次。</p>
+    <figure class="fig">
+      <svg class="diagram" viewBox="0 0 720 250" role="img" aria-label="單價下降與用量上升的剪刀差示意圖">
+        <line class="wire" x1="60" y1="210" x2="690" y2="210"/>
+        <line class="wire" x1="60" y1="30" x2="60" y2="210"/>
+        <path class="wire" d="M70 50 C 240 70, 420 150, 680 195" style="stroke:var(--warm);stroke-width:3"/>
+        <path class="wire hl" d="M70 195 C 300 190, 480 130, 680 45" style="stroke-width:3"/>
+        <text x="84" y="44" style="fill:var(--warm);font-weight:700">每百萬 token 單價</text>
+        <text x="500" y="186" style="fill:var(--warm)">三年約 ÷140</text>
+        <text x="505" y="40" style="fill:var(--accent);font-weight:700">token 用量</text>
+        <text x="84" y="186" style="fill:var(--accent)">兩年約 ×1400</text>
+        <text class="sub" x="60" y="232">過去</text>
+        <text class="sub" x="652" y="232">現在</text>
+        <text class="sub" x="300" y="232">示意圖，非等比例</text>
+      </svg>
+      <div class="nums" style="margin-top:14px">
+        <div class="num warm"><div class="v">÷140</div><div class="l">每百萬輸出 token 的單價，三年跌幅</div><div class="s">repo 演講稿，2026-09；以代表性模型的目錄價計</div></div>
+        <div class="num"><div class="v">×1400</div><div class="l">中國日均 token 消耗，兩年成長</div><div class="s">repo 演講稿，2026-09</div></div>
+        <div class="num"><div class="v">5–30×</div><div class="l">agent 任務的 token 耗用，相對於一般對話</div><div class="s">repo 演講稿，2026-09；一件事呼叫模型 10–20 次</div></div>
+      </div>
+      <figcaption><b>圖 2</b>　價格與用量的剪刀差。兩個倍數的時間長度與地區範圍不同，不能直接相乘推估市場規模；它們要說明的是方向。</figcaption>
+    </figure>
+    <div class="callout analogy"><b>類比</b><p>電力。一百四十多年前第一批商用電很貴，只點得起幾條街的燈；後來實際電價降了幾十倍，電力產業的總產值卻比蒸汽時代大了好幾個數量級。便宜到沒人在意單價的時候，才是用量爆發的開始。</p></div>
+    <details class="check"><summary>對這門生意來說，什麼訊號才是真的危險？</summary>
+      <p>不是「單價趨近於零」，而是「價格跌了、用量卻沒有跟著漲」。只要降價還換得到更大的用量，盤子就在變大。面試被問到產業前景時，這是比較有層次的回答。</p></details>
+  </article>
+
+  <article class="concept" id="c3">
+    <h3><span class="no">3</span>工廠的帳本：收入靠產能，成本是折舊</h3>
+    <p class="claim">收入 ＝ 卡數 × 單卡吞吐 × 時間 × 利用率 × 單價；成本最大的一項是硬體折舊，不是電費。</p>
+    <p>五個乘數裡，卡數和時間花錢就能解決；單卡吞吐、利用率和單價才是本事。所以這門生意的命脈只有兩件：把產能做上去，以及讓 token 更值錢。前者是後面幾週所有技術的目的，後者是行銷與方案的工作。</p>
+    <figure class="fig">
+      <div class="formula">
+        <span class="term money">卡數<small>花錢解決</small></span><span class="op">×</span>
+        <span class="term skill">單卡吞吐<small>tokens/s</small></span><span class="op">×</span>
+        <span class="term money">時間<small>花錢解決</small></span><span class="op">×</span>
+        <span class="term skill">利用率<small>賣掉的比例</small></span><span class="op">×</span>
+        <span class="term skill">單價<small>每百萬 token</small></span><span class="op">＝</span>
+        <span class="term">收入</span>
+      </div>
+      <div class="bars" style="margin-top:16px">
+        <div class="bar warm"><span>折舊</span><i style="--v:60"></i><span>60%</span></div>
+        <div class="bar mute"><span>網路</span><i style="--v:10"></i><span>10%</span></div>
+        <div class="bar mute"><span>人力與頻寬</span><i style="--v:10"></i><span>10%</span></div>
+        <div class="bar mute"><span>軟體</span><i style="--v:10"></i><span>10%</span></div>
+        <div class="bar"><span>電費</span><i style="--v:8"></i><span>8%</span></div>
+      </div>
+      <figcaption><b>圖 3</b>　上：收入公式，綠色是要靠能力的乘數。下：成本結構，出自 TokenFactory 白皮書的 128 節點 H20 叢集案例（repo 演講稿引用，2026-09；原文所列五項合計 98%）。這是單一案例，不同地區與機型的比例會不同。</figcaption>
+    </figure>
+    <p>還有一個陷阱：機器跑得出來的 token，不等於賣得掉的 token。壓測時不顧延遲硬灌負載，吞吐數字很漂亮，但回應太慢的請求等於在趕走使用者。真正可售的產能叫 <b>Goodput</b>——成功、而且體驗達標（符合 SLO）的請求所產出的 token。產能必須和承諾一起報：首個 token 多久出來（TTFT）、之後每個 token 的間隔（ITL）第 99 百分位是多少、成功率多少。</p>
+    <div class="callout customer"><b>對客戶</b><p>聽到「我們的系統每秒可以跑 X 個 token」時，TMM 的下一句永遠是：「在什麼延遲條件下？」</p></div>
+    <details class="check"><summary>折舊佔六成、電費不到一成——那為什麼概念 1 又說電力最關鍵？</summary>
+      <p>兩件事不衝突。電費是成本表上的一個小項目；電力容量卻是產能的天花板。成本可以靠多賣來攤薄，天花板不行。所以看成本要盯折舊（讓機器不要閒著），看成長要盯每瓦產出。</p></details>
+  </article>
+
+  <article class="concept" id="c4">
+    <h3><span class="no">4</span>成本的三個維度，與這門課的地圖</h3>
+    <p class="claim">每個 token 的成本來自算、存、傳三件事，所有降本技術都是在其中一維「少做一點」；這三維對應到基礎設施的五層。</p>
+    <p>一次生成分兩步。<b>Prefill</b>（讀題）：把整段輸入算完，把結果存在 GPU 記憶體裡，這份存檔叫 KV Cache，對話越長它越大。<b>Decode</b>（逐字）：每生成一個 token，都要把存檔和模型權重再讀一遍。由此得到三個成本維度：參數越多，要省<b>算</b>；上下文越長，要省<b>存</b>；模型大到一張卡放不下、得拆到多張卡，要省<b>傳</b>。</p>
+    <div class="tbl"><table>
+      <thead><tr><th>維度</th><th>問題從哪來</th><th>「少做」的技術舉例</th><th>主要落在哪一層</th></tr></thead>
+      <tbody>
+        <tr><td>算</td><td>參數量越來越大</td><td>MoE 稀疏啟動（每個 token 只啟動一小部分參數）</td><td>① 晶片、⑤ 軟體</td></tr>
+        <tr><td>存</td><td>上下文越來越長</td><td>KV 壓縮、4-bit 量化、PagedAttention、prefix caching</td><td>① 晶片（記憶體）、⑤ 軟體</td></tr>
+        <tr><td>傳</td><td>模型拆到多張卡、多個節點</td><td>PD 分離、拓撲感知排程</td><td>② 節點、③ 叢集網路</td></tr>
+        <tr><td>時間</td><td>請求零零散散地來</td><td>Continuous batching、投機解碼</td><td>⑤ 軟體</td></tr>
+      </tbody>
+    </table></div>
+    <figure class="fig">
+      <div class="stack">
+        <div class="layer"><span class="n">①</span><span class="name">晶片<span class="wk">W1</span></span><span class="tech">GPU、HBM</span><span class="metric">FLOPS · 記憶體頻寬</span></div>
+        <div class="layer"><span class="n">②</span><span class="name">節點<span class="wk">W2</span></span><span class="tech">PCIe、NVLink、機櫃級系統</span><span class="metric">GB/s · GPU 數／節點</span></div>
+        <div class="layer"><span class="n">③</span><span class="name">叢集網路<span class="wk">W3</span></span><span class="tech">InfiniBand、Ethernet／RoCE、DPU</span><span class="metric">延遲 · 頻寬</span></div>
+        <div class="layer"><span class="n">④</span><span class="name">資料中心<span class="wk">W4</span></span><span class="tech">供電、液冷、TCO</span><span class="metric">kW／rack · PUE</span></div>
+        <div class="layer hl"><span class="n">⑤</span><span class="name">軟體與工作負載<span class="wk">W5–W8</span></span><span class="tech">CUDA、Kubernetes、推論引擎、模型</span><span class="metric">tokens/s · TTFT · Goodput</span></div>
+      </div>
+      <figcaption><b>圖 4</b>　本課程的五層堆疊地圖（由下往上讀）。W9–W11 談市場、競爭與需求，是站在這五層之上看生意。期中考會要求你憑記憶畫出這張圖。</figcaption>
+    </figure>
+    <details class="check"><summary>模型大到要拆到好幾張卡、甚至好幾台機器時，主要多出哪一維的成本？為什麼跨機器特別痛？</summary>
+      <p>多出「傳」。卡與卡之間每一步都要交換資料。repo 的演講稿給了一個量級：同一節點內 NVLink 的頻寬大約是 GPU 自己記憶體（HBM）頻寬的九分之一，大部分還藏得住；跨節點的 InfiniBand 只有約一百六十分之一，藏不住，產能會被拖下來。這就是 W2、W3 要花兩週講互連與網路的原因。</p></details>
+  </article>
+</section>
+
+<section id="worked">
+  <h2><span class="step">STEP 5</span>動手算<small>先自己算，再對答案</small></h2>
+  <p>一座小型工廠有 <b>500 張 GPU</b>，每張滿載可產出 <b>3,000 tokens/s</b>，售價<b>每百萬 token US$0.4</b>。（數字是為了練習而假設的，不代表任何實際硬體或市價。）</p>
+  <p>請算出：① 滿載時一天能產出多少 token？② 利用率 40% 與 75% 時，每天營收各多少？③ 這兩個情境的折舊有沒有不同？</p>
+  <details class="check"><summary>拿紙筆算完了嗎？</summary>
+    <p>① 500 × 3,000 × 86,400 秒 ＝ 1.296×10¹¹ tokens，也就是 129,600 百萬 token。</p>
+    <p>② 40%：129,600 × 0.4 ＝ 51,840 百萬 token，乘以 US$0.4 ＝ <b>US$20,736／天</b>。75%：129,600 × 0.75 ＝ 97,200 百萬 token，乘以 US$0.4 ＝ <b>US$38,880／天</b>。相差約 1.9 倍。</p>
+    <p>③ 沒有不同。機器買了就開始折舊，不管它忙不忙。所以多出來的營收幾乎直接變成毛利——這就是「利用率是第一槓桿」的意思。</p>
+    <p>心算技巧：一天是 86,400 秒，記成「約 10⁵ 秒」，就能很快估出數量級。</p></details>
+</section>
+
+<section id="myths">
+  <h2><span class="step">STEP 6</span>常見誤解</h2>
+  <div class="callout warn"><b>誤解一：AI 機房的成本主要是電費</b><p>以公開案例來看，最大項是硬體折舊，電費是個位數百分比。電力的重要性在於它是產能上限，而不是成本表上最大的那一列。對客戶談選址時，先問「拿得到多少電、多快拿到」，再談電價。</p></div>
+  <div class="callout warn"><b>誤解二：吞吐量就是產能</b><p>沒有附帶延遲條件的吞吐數字不能拿來賣，也不能拿來比。可售產能是 Goodput。看到任何效能宣稱，先找它的 SLO 條件。</p></div>
+  <div class="callout warn"><b>誤解三：token 越來越便宜，這個市場會越來越小</b><p>目前的數據指向相反：降價帶來更大的用量成長。真正要警覺的是「降價換不到用量」那一天。</p></div>
+</section>
+
+<section id="pitch">
+  <h2><span class="step">STEP 7</span>對客戶怎麼說<small>English</small></h2>
+  <div class="callout customer"><b>60-SECOND VERSION</b>
+    <p lang="en">"A modern AI data center works like a factory. Electricity goes in, and tokens come out — tokens are simply the units of output an AI model produces. That changes how you measure the business. It used to be about how many GPU hours you could rent out. Now it's about how many tokens you can produce and sell at the quality you promised. And here's the constraint: once a site is built, its power is fixed. So the question isn't how many GPUs you own. It's how many tokens you get out of every watt, and how much of that capacity you actually sell."</p>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>可以直接拿來用的片語</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td lang="en">the units of output an AI model produces</td><td>向非技術聽眾解釋 token，不必提 tokenizer</td></tr>
+      <tr><td lang="en">at the quality you promised</td><td>服務水準（SLO）的白話說法</td></tr>
+      <tr><td lang="en">its power is fixed</td><td>供電容量是固定上限</td></tr>
+      <tr><td lang="en">tokens out of every watt</td><td>tokens per watt 的口語版</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><b>對方可能反問</b>
+    <p lang="en">"If power is such a small part of the cost, why does everyone talk about it?"</p>
+    <p>回應方向：成本與上限是兩回事。<span lang="en">"Power is a small line on the cost sheet, but it's the ceiling on what you can produce. You can spread hardware cost over more output. You can't spread a megawatt you don't have."</span></p></div>
+</section>
+
+<section id="exit">
+  <h2><span class="step">STEP 8</span>課後小考<small>15 分鐘 · 閉卷 · 計分</small></h2>
+  <p class="lead">關掉其他分頁。每題先寫答案、選信心，再看參考答案自評 0–3 分。前三題是你課前猜過的題目，看看答案變了多少。</p>
+  <div class="q" data-qid="w01-l1-q01" data-kind="Q" data-type="explain">
+<p class="q-text">黃仁勳說資料中心不再是一台電腦，而是一座「工廠」。這座工廠的原料與產品各是什麼？它最重要的 KPI 是什麼，為什麼是這個？</p>
+<aside class="q-answer"><p>注入能量（電力），產出的產品是 token。頭號 KPI 是 tokens per watt（每瓦 token 產出）：一座機房的供電容量是物理上限，蓋好之後 1 GW 不會變成 2 GW，所以營收只能靠同樣的電產出更多 token 來成長。</p><ul>
+<li>原料是電力，產品是 token</li>
+<li>KPI 是 tokens per watt</li>
+<li>原因：供電容量是固定的物理上限</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 03、頁 16）（2026-09 演講口徑）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q02" data-kind="Q" data-type="recall">
+<p class="q-text">一座 Token 工廠的成本結構裡，佔比最大的是哪一項？電費大約佔多少？（數量級即可）</p>
+<aside class="q-answer"><p>折舊最大，約六成；電費只有約 8%。以 TokenFactory 白皮書的 128 節點 H20 叢集為例：折舊 60%、電費 8%、網路 10%、人力與頻寬 10%、軟體 10%。所以 AI 工廠「不吃電，吃折舊」，利用率與單卡吞吐才是第一槓桿。</p><ul>
+<li>折舊最大，約 60%</li>
+<li>電費約 8%，是個位數百分比</li>
+<li>推論：硬體要盡快把產能賣掉，利用率是第一槓桿</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 07）（2026-09，TokenFactory 白皮書口徑，128 節點 H20 叢集單一案例）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q03" data-kind="Q" data-type="explain">
+<p class="q-text">每百萬 token 的輸出單價三年跌了約 140 倍。這個產業的總盤子是變大還是變小？用一個經濟學概念解釋，並說出需求端正在發生的結構變化。</p>
+<aside class="q-answer"><p>變大。這是 Jevons 悖論：單價下降讓用量成長得更快，總支出反而上升（演講引用的數字：中國日均 token 消耗兩年成長約 1400 倍）。需求結構上，消耗主力正從「人」變成「機器」——Agent 完成一件事要呼叫模型 10–20 次，token 耗用是一般對話的 5–30 倍。</p><ul>
+<li>總盤子變大</li>
+<li>Jevons 悖論：降價帶來更大的用量成長</li>
+<li>消耗主力從人轉向 Agent</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 02、頁 19–20）（2026-09 演講口徑）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q04" data-kind="Q" data-type="recall">
+<p class="q-text">寫出 Token 工廠的收入公式（展開到四個乘數加單價）。哪些乘數「花錢就能解決」？哪些才是「本事」？</p>
+<aside class="q-answer"><p>收入 ＝ 年產出 × 單價；年產出 ＝ 卡數 × 單卡吞吐 × 時間 × 利用率。卡數與時間是花錢能解決的；單卡吞吐（連同利用率）與單價才是本事。整門生意的命脈因此只有兩件事：把產能做上去、讓 token 更值錢。</p><ul>
+<li>收入 ＝ 卡數 × 單卡吞吐 × 時間 × 利用率 × 單價</li>
+<li>卡數、時間靠資本</li>
+<li>吞吐／利用率與單價靠能力</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 07）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q05" data-kind="Q" data-type="compare">
+<p class="q-text">比較「算力房東」與「產品製造商（Token 工廠）」兩種商業模式：賣的東西、利用率、毛利率、回本年限各差在哪？</p>
+<aside class="q-answer"><p>算力房東賣 GPU 小時（賣時間）：利用率 30–50%、毛利率 20–30%、回本 3–5 年。Token 工廠賣產出（token）：利用率 80% 以上、毛利率 40–50%、回本約 2 年。同一張卡，客戶買的從「時間」變成「產出」，帳本就完全不同。</p><ul>
+<li>賣時間（GPU 小時）對比賣產出（token）</li>
+<li>利用率 30–50% 對比 80% 以上</li>
+<li>回本 3–5 年對比約 2 年（毛利率 20–30% 對比 40–50%）</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 06）（2026-09 演講口徑）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q06" data-kind="Q" data-type="explain">
+<p class="q-text">什麼是 Goodput？為什麼說壓測刷出來的原始吞吐是「假產能」？</p>
+<aside class="q-answer"><p>Goodput 是「成功、而且體驗達標的請求」所產出的 token，也就是符合 SLO 的產量。不顧體驗硬灌負載，吞吐數字很漂亮，但延遲超標的請求等於在流失使用者，那些 token 賣不出去。所以可售產能必須配一張承諾表（例如 TTFT 依請求長度分級、ITL P99、成功率、達標率）。</p><ul>
+<li>Goodput ＝ 符合 SLO 的請求所產出的 token</li>
+<li>原始吞吐不看延遲與成功率，超標的產出賣不掉</li>
+<li>產能要和服務承諾（TTFT、ITL P99、成功率）綁在一起報</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 08）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q07" data-kind="Q" data-type="explain">
+<p class="q-text">一次生成分成哪兩步？由此推出 token 成本的三個維度是什麼？每個維度各舉一項「少做」的技術。</p>
+<aside class="q-answer"><p>兩步是 prefill（讀題：把整個輸入算完，把結果存成 KV Cache）與 decode（逐字：每生成一個 token 都要把存檔和權重再讀一遍）。三個維度是算、存、傳：省算如 MoE 稀疏啟動；省存如 KV 壓縮、4-bit 量化、PagedAttention、prefix caching；省傳如 PD 分離、拓撲感知排程。另有引擎排程省時間，如 continuous batching。</p><ul>
+<li>prefill 與 decode</li>
+<li>三維：算、存、傳</li>
+<li>每一維各能舉出一項對應技術</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 10–11）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q08" data-kind="Q" data-type="calc">
+<p class="q-text">假設一座工廠有 1,000 張 GPU，每張滿載 2,000 tokens/s，售價每百萬 token US$0.5。利用率 30% 與 80% 時，每天營收各是多少？兩者差幾倍？這說明了什麼？（寫出步驟）</p>
+<aside class="q-answer"><p>滿載日產出 ＝ 1,000 × 2,000 × 86,400 秒 ＝ 1.728×10¹¹ tokens ＝ 172,800 百萬 token。利用率 30%：51,840 百萬 × 0.5 ＝ US$25,920／天。利用率 80%：138,240 百萬 × 0.5 ＝ US$69,120／天。相差約 2.7 倍，而折舊這個最大的成本項完全沒變——所以利用率是第一槓桿。</p><ul>
+<li>滿載日產出約 1.73×10¹¹ tokens（172,800 百萬）</li>
+<li>30% 約 US$2.6 萬／天，80% 約 US$6.9 萬／天</li>
+<li>結論：成本幾乎固定，利用率直接決定賺賠</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 06–07）（題目數字為教學用假設，不代表任何實際硬體的吞吐或市價）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q09" data-kind="Q" data-type="scenario">
+<p class="q-text">你是 TMM。客戶的 CFO 在會議上說：「AI 機房的成本主要就是電費吧？那我們找電價最便宜的地方蓋就好。」你怎麼回應？</p>
+<aside class="q-answer"><p>先接住：電力確實關鍵。再修正：以公開白皮書的案例，成本最大項是硬體折舊（約六成），電費只有約 8%；電力的角色比較像「產能天花板」——拿到多少瓦，就決定最多能放多少算力。所以該比的不是電價，而是同樣的電能產出多少可售的 token（tokens per watt）以及利用率能不能拉高。最後給建議：選址先看拿得到多少電、多快拿到，再看電價。</p><ul>
+<li>成本最大項是折舊而非電費（約 60% 對 8%）</li>
+<li>電力是產能上限，不只是成本項</li>
+<li>把對話導向 tokens per watt 與利用率，並給出可行動的建議</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 07、頁 16）（2026-09，白皮書單一案例口徑；對客戶引用時要說明這是一個案例）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q10" data-kind="Q" data-type="pitch">
+<p class="q-text">英文口說，60 秒，對象是非技術背景的高階主管：What is an "AI factory", and why does "tokens per watt" matter?（錄音後自評）</p>
+<aside class="q-answer"><p lang="en">參考講法："Think of a modern data center as a factory. Electricity goes in, and tokens — the units of AI output — come out. The business used to be renting GPU hours; now it's selling output. Here's the catch: once a site is built, its power is fixed. A one-gigawatt site never becomes two. So the only way to grow revenue is to produce more tokens from every watt, at the service level you promised. That's why tokens per watt, not GPU count, is the number to watch."</p><ul>
+<li>工廠類比：電力進、token 出</li>
+<li>商業模式從賣時間變成賣產出</li>
+<li>電力是固定上限，所以 tokens per watt 決定營收</li>
+<li>60 秒內講完且有明確的 so what</li>
+</ul><p class="q-src">出處：99_misc/token_factory_talk/talk-illustrated.md（頁 03、頁 06、頁 16）</p></aside>
+</div>
+  <div class="q" data-qid="w01-l1-q11" data-kind="Q" data-type="draw">
+<p class="q-text">憑記憶畫出本課程的五層堆疊地圖（由下往上），每一層寫出一項關鍵技術與一個關鍵指標。</p>
+<aside class="q-answer"><p>① 晶片：GPU、HBM——算力（FLOPS）、記憶體頻寬。② 節點：PCIe、NVLink——GPU 之間與 GPU 對周邊的頻寬（GB/s）。③ 叢集網路：InfiniBand、Ethernet／RoCE——延遲與頻寬。④ 資料中心：供電、液冷——kW／rack、PUE。⑤ 軟體與工作負載：CUDA、Kubernetes、推論引擎、模型——tokens/s、TTFT。</p><ul>
+<li>五層名稱與順序正確：晶片、節點、叢集網路、資料中心、軟體與工作負載</li>
+<li>每層至少一項正確的關鍵技術</li>
+<li>每層至少一個正確的指標</li>
+</ul><p class="q-src">出處：00_study_plan/syllabus.md（學習成果 LO1）</p></aside>
+</div>
+  <div class="scorebar"><span>計分題 <b id="sc-done">0</b>/<b id="sc-n">0</b></span><span>得分 <b id="sc-pts">0</b>/<b id="sc-max">0</b></span><span id="sc-pct"></span><button class="btn primary" id="export">複製成績</button></div>
+  <textarea id="export-out" readonly aria-label="成績字串"></textarea>
+  <p class="note">按「複製成績」後，把那一行貼給 Claude（說「幫我入帳」），它會更新間隔複習排程。</p>
+</section>
+
+<section id="wrap">
+  <h2><span class="step">STEP 9</span>收尾<small>15 分鐘</small></h2>
+  <div class="wrap-box">
+    <p><b>一句話總結</b>：不看上面，用自己的話寫下今天最重要的一件事。</p>
+    <textarea data-save="summary" placeholder="今天最重要的一件事是…"></textarea>
+    <p><b>我的類比</b>：挑一個概念，寫一個你自己想的生活類比。</p>
+    <textarea data-save="analogy" placeholder="這就像…"></textarea>
+    <p><b>英文 60 秒</b>：蓋住 STEP 7，用手機錄一次自己的版本。</p>
+  </div>
+  <p><b>這一課的題目會在這幾天回來找你：</b></p>
+  <ul class="review" id="review-dates"></ul>
+  <p class="note">明天：w01-l2　CPU vs GPU：為什麼 AI 需要大量平行運算。</p>
+</section>
+
+<section id="glossary">
+  <h2>術語</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>English</th><th>台灣用語</th><th>repo 用語</th><th>一句話</th></tr></thead>
+    <tbody>
+      <tr><td>AI factory</td><td>AI 工廠</td><td>AI 工厂、Token 工厂</td><td>以產出 token 為目的的資料中心</td></tr>
+      <tr><td>token</td><td>token</td><td>token、词元</td><td>模型處理與輸出文字的基本單位，也是計費單位</td></tr>
+      <tr><td>tokens per watt</td><td>每瓦 token 產出</td><td>每瓦 token 产出</td><td>AI 工廠的效率指標</td></tr>
+      <tr><td>utilization</td><td>利用率、使用率</td><td>利用率</td><td>產能中實際賣掉的比例</td></tr>
+      <tr><td>throughput</td><td>吞吐量</td><td>吞吐</td><td>單位時間的產出量</td></tr>
+      <tr><td>Goodput</td><td>Goodput</td><td>Goodput</td><td>符合服務水準的有效產出</td></tr>
+      <tr><td>depreciation</td><td>折舊</td><td>折旧</td><td>硬體購置成本按年攤提</td></tr>
+      <tr><td>prefill / decode</td><td>prefill／decode</td><td>读题／逐字</td><td>推論的兩個階段：處理輸入、逐一生成輸出</td></tr>
+      <tr><td>KV Cache</td><td>KV Cache</td><td>KV Cache</td><td>把已處理的上下文存在 GPU 記憶體，避免重算</td></tr>
+      <tr><td>Jevons paradox</td><td>傑文斯悖論</td><td>杰文斯悖论</td><td>效率提升使單價下降，總消耗反而增加</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="sources">
+  <h2>出處與延伸</h2>
+  <ul>
+    <li><b>必讀</b>　<a class="repo" data-path="99_misc/token_factory_talk/talk-illustrated.md"></a> —— 本課概念 1–4 的主要來源（頁 02–11、15–20）。</li>
+    <li><b>必讀</b>　<a class="repo" data-path="01_hardware_architecture/README.md"></a> —— 第 1 節的硬體分層表，對照本課的五層地圖。</li>
+    <li>延伸　<a class="repo" data-path="99_misc/token_factory_talk/references/03-business-model-and-finance.md"></a> —— 成本結構與「電力佔比」不同口徑的辨析，W4 會細讀。</li>
+    <li>延伸　<a class="repo" data-path="99_misc/token_factory_talk/references/05-jevons-demand-future.md"></a> —— 需求端數據。</li>
+    <li>課程地圖　<a class="repo" data-path="00_study_plan/syllabus.md"></a></li>
+  </ul>
+  <p class="note">本頁數字皆轉引自 repo 文章，時點為 2026 年 8–9 月，口徑以各圖下方註記為準。對外引用前請回到原文確認出處。</p>
+</section>
+
+</main>
+<footer>AIF-GTM-12 · w01-l1 · 講義由 course-handout skill 產生；內容以 repo 原文為準，發現不一致時請以原文更正本頁。</footer>
+
+<!-- HANDOUT:SCRIPT:BEGIN（由 handout.py sync 維護，不要手改這一段） -->
+<script>
+(function(){
+  var REPO_BLOB="https://github.com/54Laichu/AI-fundamentals/blob/main/";
+  var root=document.documentElement, lesson=root.dataset.lesson, K="aif:"+lesson+":";
+  var store={get:function(k){try{return localStorage.getItem(K+k)}catch(e){return null}},
+             set:function(k,v){try{localStorage.setItem(K+k,v)}catch(e){}}};
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  var TYPE={recall:"回想",explain:"解釋",compare:"比較",calc:"計算",scenario:"情境",pitch:"定位",draw:"畫圖"};
+  var KIND={P:"預測（不計分）",Q:"課後",R:"複習"};
+
+  // repo 連結
+  document.querySelectorAll("a.repo[data-path]").forEach(function(a){
+    a.href=REPO_BLOB+encodeURI(a.dataset.path);a.target="_blank";a.rel="noopener";
+    if(!a.textContent.trim()){var c=el("code",null,a.dataset.path);a.appendChild(c)}
+  });
+
+  // 自由文字欄位
+  document.querySelectorAll("textarea[data-save]").forEach(function(t){
+    t.value=store.get("note:"+t.dataset.save)||"";
+    t.addEventListener("input",function(){store.set("note:"+t.dataset.save,t.value)});
+  });
+
+  // 題目
+  var scored=[];
+  document.querySelectorAll(".q[data-qid]").forEach(function(q){
+    var qid=q.dataset.qid, kind=q.dataset.kind||"Q", key=qid+":"+kind;
+    var head=el("div","q-head");
+    head.appendChild(el("span","tag",KIND[kind]||kind));
+    if(q.dataset.type)head.appendChild(el("span","tag",TYPE[q.dataset.type]||q.dataset.type));
+    head.appendChild(el("span",null,qid));
+    q.insertBefore(head,q.firstChild);
+    var ans=q.querySelector(".q-answer"), anchor=ans||null;
+    function add(n){q.insertBefore(n,anchor);return n}
+    var sync=function(){};
+
+    if(kind==="Q"){var prev=store.get(qid+":P:text");
+      if(prev){add(el("div","q-prev","你課前的答案：\n"+prev))}}
+
+    var ta=add(el("textarea"));ta.placeholder=kind==="P"?"先寫下你的猜測…":"不看資料，寫下你的答案…";
+    ta.value=store.get(key+":text")||"";
+    var row=add(el("div","q-row"));
+    row.appendChild(el("span",null,"信心"));
+    var conf=+(store.get(key+":conf")||0), confBtns=[];
+    ["1 猜的","2 大概","3 確定"].forEach(function(t,i){
+      var b=el("button",null,t);b.type="button";b.setAttribute("aria-pressed",conf===i+1);
+      b.addEventListener("click",function(){conf=i+1;store.set(key+":conf",conf);confBtns.forEach(function(x,j){x.setAttribute("aria-pressed",j===i)});sync()});
+      confBtns.push(b);row.appendChild(b);
+    });
+    var state={qid:qid,kind:kind,score:null,conf:function(){return conf}};
+    if(kind==="P"){
+      ta.addEventListener("input",function(){store.set(key+":text",ta.value)});
+      state.score=function(){var s=store.get(qid+":P:score");return s==null?null:+s};
+      scored.push(state);
+      return;
+    }
+    var rev=el("button","reveal","看參考答案");rev.type="button";row.appendChild(rev);
+    var skip=el("button",null,"我不會");skip.type="button";row.appendChild(skip);
+    var row2=add(el("div","q-row"));row2.style.display="none";
+    var flag=el("span","flag");
+    var score=store.get(key+":score");score=score==null?null:+score;
+    function scoreRow(label,k,cur,cb){
+      var wrap=el("span");wrap.appendChild(el("span",null,label+" "));var bs=[];
+      [0,1,2,3].forEach(function(n){var b=el("button",null,String(n));b.type="button";b.setAttribute("aria-pressed",cur===n);
+        b.addEventListener("click",function(){store.set(k,n);bs.forEach(function(x,j){x.setAttribute("aria-pressed",j===n)});cb(n)});bs.push(b);wrap.appendChild(b)});
+      return wrap;
+    }
+    row2.appendChild(scoreRow("自評",key+":score",score,function(n){score=n;flagIt();total()}));
+    if(kind==="Q"&&store.get(qid+":P:text")){
+      var ps=store.get(qid+":P:score");
+      row2.appendChild(scoreRow("課前那版",qid+":P:score",ps==null?null:+ps,function(){total()}));
+    }
+    row2.appendChild(flag);
+    function flagIt(){flag.className="flag";flag.textContent="";
+      if(score==null||!conf)return;
+      if(conf===3&&score<=1){flag.className="flag over";flag.textContent="很有把握卻答錯——這題最值得重看"}
+      else if(conf===1&&score===3){flag.className="flag under";flag.textContent="其實你會了，下次大方講出來"}}
+    function reveal(){q.classList.add("revealed");row2.style.display="";rev.disabled=true;skip.disabled=true;ta.readOnly=true;store.set(key+":rev","1");flagIt()}
+    sync=function(){rev.disabled=q.classList.contains("revealed")||!(ta.value.trim()&&conf)};
+    ta.addEventListener("input",function(){store.set(key+":text",ta.value);sync()});
+    rev.addEventListener("click",reveal);
+    skip.addEventListener("click",function(){if(!ta.value.trim()){ta.value="（不會）";store.set(key+":text",ta.value)}if(!conf){conf=1;store.set(key+":conf",1);confBtns[0].setAttribute("aria-pressed",true)}reveal()});
+    if(store.get(key+":rev"))reveal();
+    sync();
+    state.score=function(){return score};
+    scored.push(state);
+  });
+
+  // 成績
+  function total(){
+    var n=0,done=0,pts=0;
+    scored.forEach(function(s){if(s.kind==="P")return;n++;var v=s.score();if(v!=null){done++;pts+=v}});
+    var $=function(id){return document.getElementById(id)};
+    if(!$("sc-n"))return;
+    $("sc-n").textContent=n;$("sc-done").textContent=done;$("sc-pts").textContent=pts;$("sc-max").textContent=done*3;
+    $("sc-pct").textContent=done?Math.round(pts/(done*3)*100)+"%":"";
+  }
+  total();
+  var ex=document.getElementById("export");
+  if(ex)ex.addEventListener("click",function(){
+    var d=new Date(),day=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
+    var parts=[];
+    scored.forEach(function(s){var v=s.score();if(v==null)return;parts.push([s.qid,s.kind,v,s.conf()||0].join(":"))});
+    var out="AIFQ1|"+lesson+"|"+day+"|"+parts.join(";");
+    var box=document.getElementById("export-out");box.style.display="block";box.value=out;box.select();
+    if(navigator.clipboard)navigator.clipboard.writeText(out).then(function(){ex.textContent="已複製"},function(){ex.textContent="請手動複製下方文字"});
+    else ex.textContent="請手動複製下方文字";
+  });
+
+  // 間隔複習日
+  var ul=document.getElementById("review-dates");
+  if(ul&&/^\d{4}-\d{2}-\d{2}$/.test(root.dataset.date||"")){
+    var p=root.dataset.date.split("-"),base=new Date(+p[0],+p[1]-1,+p[2]),wd="日一二三四五六";
+    [1,3,7,14,30].forEach(function(n){var d=new Date(base);d.setDate(d.getDate()+n);
+      var li=el("li");li.appendChild(el("b",null,"+"+n+" 天 "));li.appendChild(document.createTextNode((d.getMonth()+1)+"/"+d.getDate()+"（"+wd[d.getDay()]+"）"));ul.appendChild(li)});
+  }
+})();
+</script>
+<!-- HANDOUT:SCRIPT:END -->
+</body>
+</html>

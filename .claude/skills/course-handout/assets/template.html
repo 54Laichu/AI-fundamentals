@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="zh-Hant" data-lesson="{{LESSON}}" data-date="{{DATE}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{LESSON}}｜{{TITLE}}</title>
+<!-- HANDOUT:STYLE:BEGIN（由 handout.py sync 維護，不要手改這一段） -->
+<style>
+:root{
+  --bg:#f7f5f0; --surface:#fffdf8; --surface2:#efece4; --ink:#1f2328; --muted:#5d646d; --line:#d9d4c7;
+  --accent:#0f766e; --accent-soft:#d9efec; --warm:#b45309; --warm-soft:#fbead2;
+  --cust:#4338ca; --cust-soft:#e4e3fb; --bad:#b42318; --bad-soft:#fbe3e0; --good:#18794e;
+  --radius:12px; --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#15171a; --surface:#1d2024; --surface2:#262a2f; --ink:#e8e6e1; --muted:#a0a6ae; --line:#373c43;
+    --accent:#4fd1c1; --accent-soft:#143d39; --warm:#f0a856; --warm-soft:#43301a;
+    --cust:#a5a2ff; --cust-soft:#2b2a55; --bad:#ff8a7a; --bad-soft:#4a211d; --good:#5fd39a;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.8}
+main,header.hero>div{max-width:820px;margin:0 auto;padding:0 18px}
+h1,h2,h3,h4{line-height:1.35;margin:0}
+p{margin:.7em 0}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);padding:.1em .35em;border-radius:5px;word-break:break-all}
+[lang="en"]{font-family:Georgia,"Times New Roman",serif}
+
+/* 頁首 */
+header.hero{background:var(--surface);border-bottom:1px solid var(--line);padding:26px 0 20px}
+.eyebrow{font-size:13px;letter-spacing:.08em;color:var(--accent);font-weight:700;text-transform:uppercase}
+header.hero h1{font-size:clamp(24px,4.6vw,34px);margin:.25em 0 .35em;text-wrap:balance}
+.meta{display:flex;flex-wrap:wrap;gap:6px 8px;font-size:13px;color:var(--muted)}
+.chip{border:1px solid var(--line);border-radius:999px;padding:1px 10px;background:var(--bg);white-space:nowrap}
+.goal{margin-top:14px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 var(--radius) var(--radius) 0;font-size:15.5px}
+.goal b{display:block;font-size:12.5px;letter-spacing:.06em;color:var(--accent)}
+
+/* 步驟導覽 */
+nav.steps{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.steps ol{max-width:820px;margin:0 auto;padding:8px 18px;display:flex;gap:6px;list-style:none;overflow-x:auto;scrollbar-width:none}
+nav.steps a{display:block;white-space:nowrap;font-size:13px;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 11px;background:var(--surface)}
+nav.steps a b{color:var(--accent);margin-right:4px}
+
+/* 區段 */
+section{padding:34px 0 6px;scroll-margin-top:52px}
+section>h2{font-size:22px;display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+section>h2 .step{flex:none;font-size:12px;font-weight:700;color:var(--surface);background:var(--accent);border-radius:6px;padding:2px 8px;letter-spacing:.04em}
+section>h2 small{font-size:13px;font-weight:400;color:var(--muted);margin-left:auto;white-space:nowrap}
+.lead{color:var(--muted);font-size:15.5px;margin-top:0}
+article.concept{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px 20px 14px;margin:18px 0}
+article.concept>h3{font-size:19px;margin-bottom:2px}
+article.concept>h3 .no{color:var(--accent);margin-right:8px;font-variant-numeric:tabular-nums}
+.claim{font-size:17.5px;font-weight:600;margin:.4em 0 .8em}
+
+/* 提示框 */
+.callout{border-radius:var(--radius);padding:12px 16px;margin:14px 0;border:1px solid var(--line);background:var(--surface)}
+.callout>b:first-child{display:block;font-size:12.5px;letter-spacing:.06em;margin-bottom:2px}
+.callout.analogy{background:var(--warm-soft);border-color:transparent}.callout.analogy>b:first-child{color:var(--warm)}
+.callout.customer{background:var(--cust-soft);border-color:transparent}.callout.customer>b:first-child{color:var(--cust)}
+.callout.warn{background:var(--bad-soft);border-color:transparent}.callout.warn>b:first-child{color:var(--bad)}
+.callout.story{background:var(--surface);border-left:4px solid var(--warm)}
+.callout p{margin:.35em 0}
+
+/* 圖：通用 */
+figure.fig{margin:16px 0;padding:16px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius);overflow-x:auto}
+article.concept figure.fig{background:var(--bg)}
+figure.fig figcaption{font-size:13.5px;color:var(--muted);margin-top:10px;line-height:1.6}
+figure.fig figcaption b{color:var(--ink)}
+
+/* 圖：層疊 stack */
+.stack{display:flex;flex-direction:column-reverse;gap:6px}
+.stack .layer{display:grid;grid-template-columns:34px 1.1fr 1.6fr 1.3fr;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14.5px;line-height:1.5}
+.stack .layer .n{font-weight:700;color:var(--accent);font-size:17px;text-align:center}
+.stack .layer .name{font-weight:700}
+.stack .layer .tech{color:var(--muted)}
+.stack .layer .metric{font-family:var(--mono);font-size:12.5px;color:var(--warm)}
+.stack .layer.hl{border-color:var(--accent);background:var(--accent-soft)}
+.stack .layer .wk{font-size:11.5px;color:var(--muted);display:block}
+
+/* 圖：流程 flow */
+.flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.flow .node{flex:1 1 120px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.5;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.flow .node b{display:block}
+.flow .node small{color:var(--muted);font-size:12.5px}
+.flow .node.hl{border-color:var(--accent);background:var(--accent-soft)}
+.flow .node.warm{border-color:var(--warm);background:var(--warm-soft)}
+.flow .arrow{flex:none;align-self:center;padding:0 8px;color:var(--muted);font-size:20px}
+.flow .arrow::before{content:"→"}
+
+/* 圖：對照 vs */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vs .side{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.6}
+.vs .side h4{font-size:15.5px;margin-bottom:6px}
+.vs .side.a{border-top:4px solid var(--muted)}.vs .side.b{border-top:4px solid var(--accent)}
+.vs dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px}
+.vs dt{color:var(--muted);font-size:13px}.vs dd{margin:0;font-weight:600}
+
+/* 圖：數字卡 nums */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.num{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.num .v{font-size:28px;font-weight:800;color:var(--accent);line-height:1.15;font-variant-numeric:tabular-nums}
+.num .l{font-size:14px;line-height:1.5;margin-top:4px}
+.num .s{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:6px;border-top:1px dashed var(--line);padding-top:5px}
+.num.warm .v{color:var(--warm)}
+
+/* 圖：橫條 bars（style="--v:60" 代表 60%） */
+.bars{display:grid;gap:7px;font-size:14px}
+.bars .bar{display:grid;grid-template-columns:minmax(72px,auto) 1fr 52px;gap:10px;align-items:center}
+.bars .bar i{display:block;height:20px;border-radius:5px;background:var(--surface2);position:relative;overflow:hidden}
+.bars .bar i::after{content:"";position:absolute;inset:0 auto 0 0;width:calc(var(--v)*1%);background:var(--accent);border-radius:5px}
+.bars .bar.warm i::after{background:var(--warm)}
+.bars .bar.mute i::after{background:var(--muted)}
+.bars .bar span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
+
+/* 圖：公式 formula */
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:15px}
+.formula .term{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 11px;text-align:center;line-height:1.4}
+.formula .term small{display:block;font-size:11.5px;color:var(--muted)}
+.formula .term.money{border-color:var(--muted)}
+.formula .term.skill{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.formula .op{color:var(--muted);font-weight:700}
+
+/* 圖：時間軸 timeline */
+.timeline{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(110px,1fr);gap:0;overflow-x:auto}
+.timeline .tick{border-top:3px solid var(--accent);padding:10px 10px 0 0;font-size:13.5px;line-height:1.5;position:relative}
+.timeline .tick::before{content:"";position:absolute;top:-7px;left:0;width:11px;height:11px;border-radius:50%;background:var(--accent)}
+.timeline .tick b{display:block;font-size:15px}
+.timeline .tick small{color:var(--muted)}
+
+/* 圖：SVG */
+svg.diagram{display:block;width:100%;height:auto;max-width:720px;margin:0 auto;font-family:var(--font)}
+svg.diagram .box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+svg.diagram .box.hl{fill:var(--accent-soft);stroke:var(--accent)}
+svg.diagram .box.warm{fill:var(--warm-soft);stroke:var(--warm)}
+svg.diagram text{fill:var(--ink);font-size:14px}
+svg.diagram text.sub{fill:var(--muted);font-size:12px}
+svg.diagram .wire{stroke:var(--muted);stroke-width:1.5;fill:none}
+svg.diagram .wire.hl{stroke:var(--accent);stroke-width:2.5}
+
+/* 表格 */
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.6}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
+
+/* 檢查點 */
+details.check{margin:14px 0 6px;border:1px dashed var(--accent);border-radius:10px;padding:10px 14px;background:var(--surface)}
+details.check summary{cursor:pointer;font-weight:600;list-style:none}
+details.check summary::-webkit-details-marker{display:none}
+details.check summary::before{content:"✋ 停一下　";color:var(--accent)}
+details.check summary::after{content:"（先在心裡回答，再點開）";font-weight:400;font-size:13px;color:var(--muted)}
+details.check[open] summary::after{content:""}
+details.check>p{margin:.5em 0 .2em}
+
+/* 題目 */
+.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin:12px 0}
+.q-head{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin-bottom:2px}
+.q-head .tag{border:1px solid var(--line);border-radius:5px;padding:0 6px}
+.q-text{font-weight:600;margin:.2em 0 .6em}
+.q textarea{width:100%;min-height:74px;font:inherit;font-size:15.5px;line-height:1.6;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical}
+.q textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.q-row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:8px;font-size:13.5px;color:var(--muted)}
+.q button,.btn{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:4px 11px;cursor:pointer}
+.q button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.q button.reveal,.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.q button:disabled{opacity:.45;cursor:not-allowed}
+.q-answer{display:none;margin:12px 0 0;padding:12px 14px;border-radius:10px;background:var(--accent-soft)}
+.q.revealed .q-answer{display:block}
+.q-answer ul{margin:.4em 0;padding-left:1.2em}
+.q-answer li{margin:.15em 0}
+.q-src{font-size:12px;color:var(--muted);margin:.4em 0 0}
+.q-prev{font-size:13.5px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:8px 0;white-space:pre-wrap}
+.q .flag{font-size:13px;font-weight:700}
+.q .flag.over{color:var(--bad)}.q .flag.under{color:var(--good)}
+
+/* 成績列 */
+.scorebar{position:sticky;bottom:10px;margin:18px 0 6px;background:var(--ink);color:var(--bg);border-radius:var(--radius);padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;box-shadow:0 6px 18px rgb(0 0 0/.18)}
+.scorebar b{font-size:18px;font-variant-numeric:tabular-nums}
+.scorebar .btn{margin-left:auto}
+#export-out{width:100%;font-family:var(--mono);font-size:12px;margin-top:8px;display:none;min-height:54px}
+.note{font-size:13.5px;color:var(--muted)}
+.wrap-box textarea{width:100%;min-height:60px;font:inherit;font-size:15.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+ul.review{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+ul.review li{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;font-size:13.5px}
+ul.review li b{color:var(--accent)}
+footer{max-width:820px;margin:30px auto 0;padding:18px 18px 90px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line)}
+
+@media (max-width:600px){
+  body{font-size:16px}
+  .stack .layer{grid-template-columns:26px 1fr;row-gap:2px}
+  .stack .layer .tech,.stack .layer .metric{grid-column:2}
+  .vs{grid-template-columns:1fr}
+  .flow{flex-direction:column}
+  .flow .node{flex:none}
+  .flow .arrow{padding:2px 0}.flow .arrow::before{content:"↓"}
+  section>h2{flex-wrap:wrap}section>h2 small{margin-left:0;width:100%}
+}
+@media print{
+  nav.steps,.scorebar,.q textarea,.q-row{display:none}
+  .q-answer{display:block}
+  body{background:#fff}
+}
+</style>
+<!-- HANDOUT:STYLE:END -->
+</head>
+<body>
+
+<header class="hero"><div>
+  <div class="eyebrow">{{LESSON}} · {{WEEK_THEME}}</div>
+  <h1>{{TITLE}}</h1>
+  <div class="meta">
+    <span class="chip">{{DATE}}</span>
+    <span class="chip">約 90 分鐘</span>
+    <!-- 這一課對哪些職缺是核心：TMM / PMM / EVG / TAM，每個一個 chip -->
+    <span class="chip">TMM</span>
+  </div>
+  <div class="goal"><b>這一課結束時，你要能不看資料回答</b>
+    <!-- 一句面試題或客戶問題，來自 syllabus.md 該課的「核心問題」 -->
+    {{CORE_QUESTION}}
+  </div>
+</div></header>
+
+<nav class="steps"><ol>
+  <li><a href="#warmup"><b>1</b>暖身回想</a></li>
+  <li><a href="#pretest"><b>2</b>先猜</a></li>
+  <li><a href="#hook"><b>3</b>為什麼重要</a></li>
+  <li><a href="#concepts"><b>4</b>核心概念</a></li>
+  <li><a href="#worked"><b>5</b>動手算</a></li>
+  <li><a href="#myths"><b>6</b>常見誤解</a></li>
+  <li><a href="#pitch"><b>7</b>對客戶怎麼說</a></li>
+  <li><a href="#exit"><b>8</b>課後小考</a></li>
+  <li><a href="#wrap"><b>9</b>收尾</a></li>
+</ol></nav>
+
+<main>
+
+<section id="warmup">
+  <h2><span class="step">STEP 1</span>暖身回想<small>10 分鐘 · 閉卷</small></h2>
+  <p class="lead">先把前幾課的東西從腦中拉出來，再開始今天的內容。想不起來是正常的——用力想的那一下才是有效的部分。</p>
+  <!-- 放 2–3 題來自「先前課次」的題目，只寫空殼，內容由 handout.py fill 從題庫帶入：
+       <div class="q" data-qid="w01-l1-q04" data-kind="R"></div>
+       第一課（w01-l1）沒有舊題，改成一段「你已經知道什麼」的自由回想提示。 -->
+</section>
+
+<section id="pretest">
+  <h2><span class="step">STEP 2</span>先猜再學<small>5 分鐘 · 不計分</small></h2>
+  <p class="lead">還沒學就先回答。猜錯沒有關係：先試過的問題，等一下讀到答案時會記得特別牢。這裡不會顯示答案。</p>
+  <!-- 剛好 3 題，題庫中 use 為 pre 的題：
+       <div class="q" data-qid="w01-l1-q01" data-kind="P"></div> -->
+</section>
+
+<section id="hook">
+  <h2><span class="step">STEP 3</span>為什麼重要</h2>
+  <!-- 一則具體的情境：誰、在什麼場合、問了什麼、你答不出來會怎樣。150 字以內。用 .callout.story -->
+  <div class="callout story"><b>情境</b><p>…</p></div>
+</section>
+
+<section id="concepts">
+  <h2><span class="step">STEP 4</span>核心概念<small>45 分鐘 · 搭配必讀文章</small></h2>
+  <p class="lead">今天只有 N 件事。每件事讀完，先回答檢查點再往下。</p>
+
+  <!-- 3–5 個 article.concept。每個都要有：一句主張（.claim）、一張圖（figure.fig）、一個檢查點（details.check）。
+       類比（.callout.analogy）全課至少 2 個。 -->
+  <article class="concept" id="c1">
+    <h3><span class="no">1</span>概念名稱</h3>
+    <p class="claim">一句話主張：讀者只記得這一句也夠用。</p>
+    <p>解釋，3–6 句。專有名詞第一次出現時寫成「中文（English）」。</p>
+    <figure class="fig">
+      <!-- 從 references/components.md 挑一種圖 -->
+      <figcaption><b>圖 1</b>　圖在說什麼。資料來源與時點。</figcaption>
+    </figure>
+    <div class="callout analogy"><b>類比</b><p>把它連到讀者已經懂的東西。</p></div>
+    <details class="check"><summary>一個需要想一下的問題？</summary><p>答案。</p></details>
+  </article>
+</section>
+
+<section id="worked">
+  <h2><span class="step">STEP 5</span>動手算<small>或一個完整案例</small></h2>
+  <!-- 一題帶步驟的估算，或一個走完全程的客戶案例。先給題目，步驟放在 details.check 裡。 -->
+</section>
+
+<section id="myths">
+  <h2><span class="step">STEP 6</span>常見誤解</h2>
+  <!-- 2–3 個 .callout.warn：「很多人以為…／其實…／所以對客戶要說…」 -->
+</section>
+
+<section id="pitch">
+  <h2><span class="step">STEP 7</span>對客戶怎麼說<small>English</small></h2>
+  <!-- 一段 60 秒英文講法（lang="en"，90–130 字），加 3–5 個關鍵片語的中文對照，再加一則常見反問與回應。 -->
+  <div class="callout customer"><b>60-SECOND VERSION</b><p lang="en">…</p></div>
+</section>
+
+<section id="exit">
+  <h2><span class="step">STEP 8</span>課後小考<small>15 分鐘 · 閉卷 · 計分</small></h2>
+  <p class="lead">關掉其他分頁。每題先寫答案、選信心，再看參考答案自評 0–3 分。前三題是你課前猜過的題目，看看答案變了多少。</p>
+  <!-- 先放 3 題預測題重答（同一個 qid，data-kind="Q"），再放 6–8 題 use 為 post 的題：
+       <div class="q" data-qid="w01-l1-q01" data-kind="Q"></div> -->
+  <div class="scorebar"><span>計分題 <b id="sc-done">0</b>/<b id="sc-n">0</b></span><span>得分 <b id="sc-pts">0</b>/<b id="sc-max">0</b></span><span id="sc-pct"></span><button class="btn primary" id="export">複製成績</button></div>
+  <textarea id="export-out" readonly aria-label="成績字串"></textarea>
+  <p class="note">按「複製成績」後，把那一行貼給 Claude（說「幫我入帳」），它會更新間隔複習排程。</p>
+</section>
+
+<section id="wrap">
+  <h2><span class="step">STEP 9</span>收尾<small>15 分鐘</small></h2>
+  <div class="wrap-box">
+    <p><b>一句話總結</b>：不看上面，用自己的話寫下今天最重要的一件事。</p>
+    <textarea data-save="summary" placeholder="今天最重要的一件事是…"></textarea>
+    <p><b>我的類比</b>：挑一個概念，寫一個你自己想的生活類比。</p>
+    <textarea data-save="analogy" placeholder="這就像…"></textarea>
+    <p><b>英文 60 秒</b>：蓋住 STEP 7，用手機錄一次自己的版本。</p>
+  </div>
+  <p><b>這一課的題目會在這幾天回來找你：</b></p>
+  <ul class="review" id="review-dates"></ul>
+  <p class="note">明天：<!-- 下一課課號與標題 --></p>
+</section>
+
+<section id="glossary">
+  <h2>術語</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>English</th><th>台灣用語</th><th>repo 用語</th><th>一句話</th></tr></thead>
+    <tbody>
+      <!-- 至少 5 列，只放這一課新出現的詞 -->
+    </tbody>
+  </table></div>
+</section>
+
+<section id="sources">
+  <h2>出處與延伸</h2>
+  <ul>
+    <!-- 必讀與引用過的 repo 文章： <li><a class="repo" data-path="相對於 repo 根目錄的路徑"></a> —— 用了哪一段</li>
+         外部資料：<li><a href="https://…">標題</a>（查閱日期）</li> -->
+  </ul>
+  <p class="note">本頁數字的時點與口徑以各圖表下方註記為準。</p>
+</section>
+
+</main>
+<footer>AIF-GTM-12 · {{LESSON}} · 講義由 course-handout skill 產生；內容以 repo 原文為準，發現不一致時請以原文更正本頁。</footer>
+
+<!-- HANDOUT:SCRIPT:BEGIN（由 handout.py sync 維護，不要手改這一段） -->
+<script>
+(function(){
+  var REPO_BLOB="https://github.com/54Laichu/AI-fundamentals/blob/main/";
+  var root=document.documentElement, lesson=root.dataset.lesson, K="aif:"+lesson+":";
+  var store={get:function(k){try{return localStorage.getItem(K+k)}catch(e){return null}},
+             set:function(k,v){try{localStorage.setItem(K+k,v)}catch(e){}}};
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  var TYPE={recall:"回想",explain:"解釋",compare:"比較",calc:"計算",scenario:"情境",pitch:"定位",draw:"畫圖"};
+  var KIND={P:"預測（不計分）",Q:"課後",R:"複習"};
+
+  // repo 連結
+  document.querySelectorAll("a.repo[data-path]").forEach(function(a){
+    a.href=REPO_BLOB+encodeURI(a.dataset.path);a.target="_blank";a.rel="noopener";
+    if(!a.textContent.trim()){var c=el("code",null,a.dataset.path);a.appendChild(c)}
+  });
+
+  // 自由文字欄位
+  document.querySelectorAll("textarea[data-save]").forEach(function(t){
+    t.value=store.get("note:"+t.dataset.save)||"";
+    t.addEventListener("input",function(){store.set("note:"+t.dataset.save,t.value)});
+  });
+
+  // 題目
+  var scored=[];
+  document.querySelectorAll(".q[data-qid]").forEach(function(q){
+    var qid=q.dataset.qid, kind=q.dataset.kind||"Q", key=qid+":"+kind;
+    var head=el("div","q-head");
+    head.appendChild(el("span","tag",KIND[kind]||kind));
+    if(q.dataset.type)head.appendChild(el("span","tag",TYPE[q.dataset.type]||q.dataset.type));
+    head.appendChild(el("span",null,qid));
+    q.insertBefore(head,q.firstChild);
+    var ans=q.querySelector(".q-answer"), anchor=ans||null;
+    function add(n){q.insertBefore(n,anchor);return n}
+    var sync=function(){};
+
+    if(kind==="Q"){var prev=store.get(qid+":P:text");
+      if(prev){add(el("div","q-prev","你課前的答案：\n"+prev))}}
+
+    var ta=add(el("textarea"));ta.placeholder=kind==="P"?"先寫下你的猜測…":"不看資料，寫下你的答案…";
+    ta.value=store.get(key+":text")||"";
+    var row=add(el("div","q-row"));
+    row.appendChild(el("span",null,"信心"));
+    var conf=+(store.get(key+":conf")||0), confBtns=[];
+    ["1 猜的","2 大概","3 確定"].forEach(function(t,i){
+      var b=el("button",null,t);b.type="button";b.setAttribute("aria-pressed",conf===i+1);
+      b.addEventListener("click",function(){conf=i+1;store.set(key+":conf",conf);confBtns.forEach(function(x,j){x.setAttribute("aria-pressed",j===i)});sync()});
+      confBtns.push(b);row.appendChild(b);
+    });
+    var state={qid:qid,kind:kind,score:null,conf:function(){return conf}};
+    if(kind==="P"){
+      ta.addEventListener("input",function(){store.set(key+":text",ta.value)});
+      state.score=function(){var s=store.get(qid+":P:score");return s==null?null:+s};
+      scored.push(state);
+      return;
+    }
+    var rev=el("button","reveal","看參考答案");rev.type="button";row.appendChild(rev);
+    var skip=el("button",null,"我不會");skip.type="button";row.appendChild(skip);
+    var row2=add(el("div","q-row"));row2.style.display="none";
+    var flag=el("span","flag");
+    var score=store.get(key+":score");score=score==null?null:+score;
+    function scoreRow(label,k,cur,cb){
+      var wrap=el("span");wrap.appendChild(el("span",null,label+" "));var bs=[];
+      [0,1,2,3].forEach(function(n){var b=el("button",null,String(n));b.type="button";b.setAttribute("aria-pressed",cur===n);
+        b.addEventListener("click",function(){store.set(k,n);bs.forEach(function(x,j){x.setAttribute("aria-pressed",j===n)});cb(n)});bs.push(b);wrap.appendChild(b)});
+      return wrap;
+    }
+    row2.appendChild(scoreRow("自評",key+":score",score,function(n){score=n;flagIt();total()}));
+    if(kind==="Q"&&store.get(qid+":P:text")){
+      var ps=store.get(qid+":P:score");
+      row2.appendChild(scoreRow("課前那版",qid+":P:score",ps==null?null:+ps,function(){total()}));
+    }
+    row2.appendChild(flag);
+    function flagIt(){flag.className="flag";flag.textContent="";
+      if(score==null||!conf)return;
+      if(conf===3&&score<=1){flag.className="flag over";flag.textContent="很有把握卻答錯——這題最值得重看"}
+      else if(conf===1&&score===3){flag.className="flag under";flag.textContent="其實你會了，下次大方講出來"}}
+    function reveal(){q.classList.add("revealed");row2.style.display="";rev.disabled=true;skip.disabled=true;ta.readOnly=true;store.set(key+":rev","1");flagIt()}
+    sync=function(){rev.disabled=q.classList.contains("revealed")||!(ta.value.trim()&&conf)};
+    ta.addEventListener("input",function(){store.set(key+":text",ta.value);sync()});
+    rev.addEventListener("click",reveal);
+    skip.addEventListener("click",function(){if(!ta.value.trim()){ta.value="（不會）";store.set(key+":text",ta.value)}if(!conf){conf=1;store.set(key+":conf",1);confBtns[0].setAttribute("aria-pressed",true)}reveal()});
+    if(store.get(key+":rev"))reveal();
+    sync();
+    state.score=function(){return score};
+    scored.push(state);
+  });
+
+  // 成績
+  function total(){
+    var n=0,done=0,pts=0;
+    scored.forEach(function(s){if(s.kind==="P")return;n++;var v=s.score();if(v!=null){done++;pts+=v}});
+    var $=function(id){return document.getElementById(id)};
+    if(!$("sc-n"))return;
+    $("sc-n").textContent=n;$("sc-done").textContent=done;$("sc-pts").textContent=pts;$("sc-max").textContent=done*3;
+    $("sc-pct").textContent=done?Math.round(pts/(done*3)*100)+"%":"";
+  }
+  total();
+  var ex=document.getElementById("export");
+  if(ex)ex.addEventListener("click",function(){
+    var d=new Date(),day=d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
+    var parts=[];
+    scored.forEach(function(s){var v=s.score();if(v==null)return;parts.push([s.qid,s.kind,v,s.conf()||0].join(":"))});
+    var out="AIFQ1|"+lesson+"|"+day+"|"+parts.join(";");
+    var box=document.getElementById("export-out");box.style.display="block";box.value=out;box.select();
+    if(navigator.clipboard)navigator.clipboard.writeText(out).then(function(){ex.textContent="已複製"},function(){ex.textContent="請手動複製下方文字"});
+    else ex.textContent="請手動複製下方文字";
+  });
+
+  // 間隔複習日
+  var ul=document.getElementById("review-dates");
+  if(ul&&/^\d{4}-\d{2}-\d{2}$/.test(root.dataset.date||"")){
+    var p=root.dataset.date.split("-"),base=new Date(+p[0],+p[1]-1,+p[2]),wd="日一二三四五六";
+    [1,3,7,14,30].forEach(function(n){var d=new Date(base);d.setDate(d.getDate()+n);
+      var li=el("li");li.appendChild(el("b",null,"+"+n+" 天 "));li.appendChild(document.createTextNode((d.getMonth()+1)+"/"+d.getDate()+"（"+wd[d.getDay()]+"）"));ul.appendChild(li)});
+  }
+})();
+</script>
+<!-- HANDOUT:SCRIPT:END -->
+</body>
+</html>
